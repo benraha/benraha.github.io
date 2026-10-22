@@ -1,117 +1,350 @@
-<html>
-  <head>
-    <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
-    <script type="text/javascript">
-      var CLIENT_ID = '307887911656-a8tumv7si9kluoinob11qi7opl26khpj.apps.googleusercontent.com';
-      var SCOPES = 'https://www.googleapis.com/auth/drive';
-
-      /**
-       * Called when the client library is loaded to start the auth flow.
-       */
-      function handleClientLoad() {
-        window.setTimeout(checkAuth, 1);
-      }
-
-      /**
-       * Check if the current user has authorized the application.
-       */
-      function checkAuth() {
-        gapi.auth.authorize(
-            {'client_id': CLIENT_ID, 'scope': SCOPES, 'immediate': true},
-            handleAuthResult);
-      }
-
-      /**
-       * Called when authorization server replies.
-       *
-       * @param {Object} authResult Authorization result.
-       */
-      function handleAuthResult(authResult) {
-        var authButton = document.getElementById('authorizeButton');
-        var filePicker = document.getElementById('filePicker');
-        authButton.style.display = 'none';
-        filePicker.style.display = 'none';
-        if (authResult && !authResult.error) {
-          // Access token has been successfully retrieved, requests can be sent to the API.
-          filePicker.style.display = 'block';
-          filePicker.onchange = uploadFile;
-        } else {
-          // No access token could be retrieved, show the button to start the authorization flow.
-          authButton.style.display = 'block';
-          authButton.onclick = function() {
-              gapi.auth.authorize(
-                  {'client_id': CLIENT_ID, 'scope': SCOPES, 'immediate': false},
-                  handleAuthResult);
-          };
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Ben Rahamim</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --text-main: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+            --card-hover-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+            --radius: 12px;
         }
-      }
 
-      /**
-       * Start the file upload.
-       *
-       * @param {Object} evt Arguments from the file selector.
-       */
-      function uploadFile(evt) {
-        gapi.client.load('drive', 'v2', function() {
-          var file = evt.target.files[0];
-          insertFile(file);
-        });
-      }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
-      /**
-       * Insert new file.
-       *
-       * @param {File} fileData File object to read data from.
-       * @param {Function} callback Function to call when the request is complete.
-       */
-      function insertFile(fileData, callback) {
-        const boundary = '-------314159265358979323846';
-        const delimiter = "\r\n--" + boundary + "\r\n";
-        const close_delim = "\r\n--" + boundary + "--";
+        html { scroll-behavior: smooth; scroll-padding-top: 80px; }
 
-        var reader = new FileReader();
-        reader.readAsBinaryString(fileData);
-        reader.onload = function(e) {
-          var contentType = fileData.type || 'application/octet-stream';
-          var metadata = {
-            'title': fileData.name,
-            'mimeType': contentType
-          };
-
-          var base64Data = btoa(reader.result);
-          var multipartRequestBody =
-              delimiter +
-              'Content-Type: application/json\r\n\r\n' +
-              JSON.stringify(metadata) +
-              delimiter +
-              'Content-Type: ' + contentType + '\r\n' +
-              'Content-Transfer-Encoding: base64\r\n' +
-              '\r\n' +
-              base64Data +
-              close_delim;
-
-          var request = gapi.client.request({
-              'path': '/upload/drive/v2/files',
-              'method': 'POST',
-              'params': {'uploadType': 'multipart'},
-              'headers': {
-                'Content-Type': 'multipart/mixed; boundary="' + boundary + '"'
-              },
-              'body': multipartRequestBody});
-          if (!callback) {
-            callback = function(file) {
-              console.log(file)
-            };
-          }
-          request.execute(callback);
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            line-height: 1.65;
+            -webkit-font-smoothing: antialiased;
         }
-      }
-    </script>
-    <script type="text/javascript" src="https://apis.google.com/js/client.js?onload=handleClientLoad"></script>
-  </head>
-  <body>
-    <!--Add a file picker for the user to start the upload process -->
-    <input type="file" id="filePicker" style="display: none" />
-    <input type="button" id="authorizeButton" style="display: none" value="Authorize" />
-  </body>
+
+        a { color: var(--primary); text-decoration: none; transition: color 0.15s ease; }
+        a:hover { color: var(--primary-hover); text-decoration: underline; }
+
+        .container { width: 100%; max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+
+        /* Navbar */
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+        }
+        .nav-container { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+        .navbar-brand { font-size: 1.15rem; font-weight: 700; color: var(--text-main); letter-spacing: -0.01em; }
+        .navbar-brand:hover { text-decoration: none; }
+        .nav-links { display: flex; gap: 24px; list-style: none; }
+        .nav-link { font-size: 0.95rem; font-weight: 500; color: var(--text-secondary); }
+        .nav-link:hover { color: var(--primary); text-decoration: none; }
+
+        /* Sections */
+        section { padding: 56px 0; }
+        .section-header { margin-bottom: 32px; }
+        .section-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            display: inline-block;
+        }
+        .section-title::after {
+            content: "";
+            display: block;
+            width: 40px;
+            height: 3px;
+            background: var(--primary);
+            margin-top: 6px;
+            border-radius: 2px;
+        }
+
+        /* About */
+        .about-grid { display: grid; grid-template-columns: 310px 1fr; gap: 48px; align-items: start; }
+        .profile-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            text-align: center;
+            box-shadow: var(--card-shadow);
+        }
+        .profile-img {
+            width: 100%;
+            max-width: 240px;
+            aspect-ratio: 1;
+            border-radius: 12px;
+            object-fit: cover;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: auto;
+            margin-right: auto;
+            background: linear-gradient(135deg, #bfdbfe, #93c5fd);
+            color: #1e3a8a;
+            font-size: 4rem;
+            font-weight: 700;
+        }
+        .profile-name { font-size: 1.35rem; font-weight: 700; margin-bottom: 4px; }
+        .profile-role { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 18px; font-weight: 500; }
+        .social-buttons { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+        .social-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            transition: all 0.2s ease;
+        }
+        .social-btn:hover {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            text-decoration: none;
+        }
+        .about-text { font-size: 1.02rem; color: var(--text-secondary); }
+        .about-text p { margin-bottom: 16px; }
+        .about-text p:last-child { margin-bottom: 0; }
+
+        /* Projects */
+        .project-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; align-items: start; }
+        .project-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--card-shadow);
+            transition: box-shadow 0.15s ease;
+        }
+        .project-card:hover { box-shadow: var(--card-hover-shadow); }
+        .project-card summary {
+            list-style: none;
+            cursor: pointer;
+            padding: 22px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        .project-card summary::-webkit-details-marker { display: none; }
+        .project-summary-text { flex: 1; }
+        .project-card summary .chevron {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: 6px;
+            transition: transform 0.2s ease;
+        }
+        .project-card[open] summary .chevron { transform: rotate(180deg); }
+        .project-details { padding: 0 22px 22px; border-top: 1px solid var(--border); padding-top: 16px; }
+        .project-details p { font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 12px; }
+        .project-details ul { margin: 0 0 14px 20px; font-size: 0.95rem; color: var(--text-secondary); }
+        .project-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 6px; }
+        .project-desc { font-size: 0.95rem; color: var(--text-secondary); }
+        .project-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+        .tag {
+            font-size: 0.75rem;
+            font-weight: 500;
+            padding: 2px 10px;
+            border-radius: 999px;
+            background: #eff6ff;
+            color: var(--primary);
+        }
+        .project-link { font-size: 0.9rem; font-weight: 500; }
+
+        footer {
+            text-align: center;
+            padding: 32px 20px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border);
+        }
+
+        @media (max-width: 800px) {
+            .about-grid { grid-template-columns: 1fr; gap: 32px; }
+            .nav-links { gap: 16px; }
+        }
+    </style>
+</head>
+<body id="page-top">
+
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a class="navbar-brand" href="#page-top">Ben Rahamim</a>
+            <ul class="nav-links">
+                <li><a class="nav-link" href="#about">About</a></li>
+                <li><a class="nav-link" href="#projects">Projects</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <section id="about">
+            <div class="container">
+                <div class="about-grid">
+                    <div class="profile-card">
+                        <!-- Replace this div with: <img src="./img/me.jpg" alt="Ben Rahamim" class="profile-img"> -->
+                        <div class="profile-img">BR</div>
+                        <h1 class="profile-name">Ben Rahamim</h1>
+                        <p class="profile-role">Big Data Group Tech Lead @ PayPal</p>
+                        <div class="social-buttons">
+                            <a target="_blank" href="https://twitter.com/" class="social-btn" title="Twitter / X"><i class="fa-brands fa-x-twitter"></i></a>
+                            <a target="_blank" href="https://www.linkedin.com/" class="social-btn" title="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+                            <a target="_blank" href="https://github.com/benraha" class="social-btn" title="GitHub"><i class="fa-brands fa-github"></i></a>
+                            <a href="mailto:you@example.com" class="social-btn" title="Email"><i class="fa-regular fa-envelope"></i></a>
+                        </div>
+                    </div>
+
+                    <div class="about-text">
+                        <div class="section-header">
+                            <h2 class="section-title">About Me</h2>
+                        </div>
+                        <p>
+                            Hi, I'm Ben Rahamim. I'm the Big Data group Tech Lead at <a target="_blank" href="https://www.paypal.com">PayPal</a>, where I oversee the group's algorithmics and work hands-on developing solutions at scale.
+                        </p>
+                        <p>
+                            I've been at PayPal since 2015, starting as a Senior ML Engineer and Algorithm Developer in the risk division. I develop advanced analytics and algorithmics for risk, run Spark solutions at PB scale in production, and specialize in distributed graph algorithms. I'm also involved in designing and implementing Gen AI initiatives across the organization.
+                        </p>
+                        <p>
+                            I'm always open to discussions and collaborations. Feel free to reach out.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="projects">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Projects</h2>
+                </div>
+                <div class="project-grid">
+                    <details class="project-card">
+                        <summary>
+                            <div class="project-summary-text">
+                                <h3 class="project-title">TabPFN Performance Optimization</h3>
+                                <p class="project-desc">Cut CPU inference time by 90% for the state-of-the-art tabular foundation model.</p>
+                            </div>
+                            <i class="fa-solid fa-chevron-down chevron"></i>
+                        </summary>
+                        <div class="project-details">
+                            <p>Contributed performance optimizations to TabPFN, the SOTA tabular model, dramatically reducing CPU inference time.</p>
+                            <ul>
+                                <li>CPU inference time reduced by 90%</li>
+                            </ul>
+                            <div class="project-tags"><span class="tag">TabPFN</span><span class="tag">Tabular ML</span><span class="tag">Performance</span></div>
+                        </div>
+                    </details>
+                    <details class="project-card">
+                        <summary>
+                            <div class="project-summary-text">
+                                <h3 class="project-title">Distributed SHAP for Tree Models</h3>
+                                <p class="project-desc">A distributed way to compute compute-intensive SHAP values, 300x faster.</p>
+                            </div>
+                            <i class="fa-solid fa-chevron-down chevron"></i>
+                        </summary>
+                        <div class="project-details">
+                            <p>Developed a distributed approach to calculating SHAP values for tree models, which are otherwise very compute-intensive.</p>
+                            <ul>
+                                <li>300x speedup</li>
+                            </ul>
+                            <div class="project-tags"><span class="tag">SHAP</span><span class="tag">Distributed</span><span class="tag">Explainability</span></div>
+                        </div>
+                    </details>
+                    <details class="project-card">
+                        <summary>
+                            <div class="project-summary-text">
+                                <h3 class="project-title">LLM Inference Cost Reduction</h3>
+                                <p class="project-desc">A technique that reduces LLM inference cost by 35% in large batches.</p>
+                            </div>
+                            <i class="fa-solid fa-chevron-down chevron"></i>
+                        </summary>
+                        <div class="project-details">
+                            <p>Designed and built a technique to reduce the cost of LLM inference while running in large batches.</p>
+                            <ul>
+                                <li>35% lower inference cost</li>
+                            </ul>
+                            <div class="project-tags"><span class="tag">LLM</span><span class="tag">Gen AI</span><span class="tag">Batch inference</span></div>
+                        </div>
+                    </details>
+                    <details class="project-card">
+                        <summary>
+                            <div class="project-summary-text">
+                                <h3 class="project-title">Entity Resolution at Scale</h3>
+                                <p class="project-desc">SOTA entity resolution inferring across billions of customers.</p>
+                            </div>
+                            <i class="fa-solid fa-chevron-down chevron"></i>
+                        </summary>
+                        <div class="project-details">
+                            <p>Developed a state-of-the-art entity resolution solution for the risk division, running in production at PB scale.</p>
+                            <ul>
+                                <li>Inference across billions of customers</li>
+                                <li>Distributed graph algorithms such as clustering and 2-hop aggregation</li>
+                            </ul>
+                            <div class="project-tags"><span class="tag">Spark</span><span class="tag">Graphs</span><span class="tag">Entity resolution</span></div>
+                        </div>
+                    </details>
+                    <details class="project-card">
+                        <summary>
+                            <div class="project-summary-text">
+                                <h3 class="project-title">Distributed GNNs</h3>
+                                <p class="project-desc">A SOTA way to run GNNs in a distributed fashion on Spark.</p>
+                            </div>
+                            <i class="fa-solid fa-chevron-down chevron"></i>
+                        </summary>
+                        <div class="project-details">
+                            <p>Developed a state-of-the-art way to run graph neural networks in a distributed fashion using Spark.</p>
+                            <ul>
+                                <li>Runs across millions of nodes</li>
+                            </ul>
+                            <div class="project-tags"><span class="tag">Spark</span><span class="tag">GNN</span><span class="tag">Distributed</span></div>
+                        </div>
+                    </details>
+                    <details class="project-card">
+                        <summary>
+                            <div class="project-summary-text">
+                                <h3 class="project-title">Ephemeral Vector Search</h3>
+                                <p class="project-desc">On-the-fly vector search over billions of vectors.</p>
+                            </div>
+                            <i class="fa-solid fa-chevron-down chevron"></i>
+                        </summary>
+                        <div class="project-details">
+                            <p>Built an ephemeral vector search capability that handles billions of vectors, without the need for a permanently running index.</p>
+                            <ul>
+                                <li>Scales to billions of vectors</li>
+                                <li>Spun up on demand and discarded when no longer needed</li>
+                            </ul>
+                            <div class="project-tags"><span class="tag">Vector search</span><span class="tag">Distributed</span><span class="tag">Gen AI</span></div>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>&copy; Ben Rahamim</footer>
+
+</body>
 </html>
