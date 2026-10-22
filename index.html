@@ -219,7 +219,7 @@
                             <h2 class="section-title">About Me</h2>
                         </div>
                         <p>
-                            Hi, I'm Ben Rahamim. I'm an expert consultant and a Big Data group Tech Lead at PayPal, where I oversee the group's algorithmics and work hands-on.
+                            Hi, I'm Ben Rahamim. I'm a freelance consultant and a Big Data group Tech Lead at PayPal, where I oversee the group's algorithmics and work hands-on.
                         </p>
                         <p>
                             At heart I'm an algorithms and software developer. I love using data science to take research projects to high-scale production, and to optimize existing systems to save time and money.
@@ -249,10 +249,10 @@
                         <div class="project-details">
                             <p>Contributed performance optimizations to TabPFN, the SOTA tabular model, dramatically reducing CPU inference time.</p>
                             <ul>
-                                <li>CPU inference time reduced by 90%</li>
-                                <li>Managed to wrap a model in ONNX, while embedding a driverset within the model, getting x1000 speedup</li>
+                                <li>Delivered several PyTorch optimizations</li>
+                                <li>Exported the model to ONNX with the driver set embedded inside it, for a 1000x speedup over native Python</li>
                             </ul>
-                            These Contribution were donated to the open source project.
+                            These contributions were donated to the open-source project.
                             <div class="project-tags"><span class="tag">TabPFN</span><span class="tag">Tabular ML</span><span class="tag">Performance</span></div>
                         </div>
                     </details>
@@ -265,8 +265,9 @@
                             <i class="fa-solid fa-chevron-down chevron"></i>
                         </summary>
                         <div class="project-details">
-                            <p>Developed a distributed approach to calculating SHAP values for tree models, which are otherwise very compute-intensive. <br><br>
-                            My approach actually made this entire project possible, since without it running this amount of compute is not feasible</p>
+                            <p>Developed an approach to calculating SHAP values for large tree-ensemble models, scoring billions of customers.</p>
+                            <p>Without it, the compute required made the project infeasible.</p>
+                            <p>I modified the algorithm to compute only the change in SHAP values relative to another tree's result.</p>
                             <div class="project-tags"><span class="tag">SHAP</span><span class="tag">Distributed</span><span class="tag">Explainability</span></div>
                         </div>
                     </details>
@@ -279,9 +280,9 @@
                             <i class="fa-solid fa-chevron-down chevron"></i>
                         </summary>
                         <div class="project-details">
-                            <p>Designed and built a technique to reduce the cost of LLM inference while running in large batches, using GGML and CPU</p>
+                            <p>Designed and built a technique to reduce the cost of LLM inference while running in large batches, running GGML on CPU</p>
                             <ul>
-                                <li>35% lower inference cost compared to naively running the models using Spark</li>
+                                <li>35% lower inference cost than a naive Spark baseline</li>
                             </ul>
                             <div class="project-tags"><span class="tag">LLM</span><span class="tag">Gen AI</span><span class="tag">Batch inference</span></div>
                         </div>
@@ -312,10 +313,8 @@
                             <i class="fa-solid fa-chevron-down chevron"></i>
                         </summary>
                         <div class="project-details">
-                            <p>Developed a state-of-the-art way to run graph neural networks in a distributed fashion using Spark.</p>
-                            <ul>
-                                <li>Runs across billions of nodes in minutes</li>
-                            </ul>
+                            <p>Developed a state-of-the-art way to run graph neural networks in a distributed fashion using Spark.<br><br>
+                            Runs across billions of nodes in minutes in a very scalble fashion</p> 
                             <div class="project-tags"><span class="tag">Spark</span><span class="tag">GNN</span><span class="tag">Distributed</span></div>
                         </div>
                     </details>
@@ -330,8 +329,8 @@
                         <div class="project-details">
                             <p>Built an ephemeral vector search capability that handles billions of vectors, without the need for a permanently running index.</p>
                             <ul>
-                                <li>Scales infinitely essentially, running on Apache Spark</li>
-                                <li>Spun up on demand and discarded when no longer needed, reducing the costs dramatically</li>
+                                <li>Scales horizontally on Apache Spark</li>
+                                <li>Spun up on demand and discarded when done, which cuts costs significantly</li>
                             </ul>
                             <div class="project-tags"><span class="tag">Vector search</span><span class="tag">Distributed</span><span class="tag">Gen AI</span></div>
                         </div>
